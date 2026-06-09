@@ -153,6 +153,14 @@ python3 -m llm_meter export-html --db llm-meter.db --output report.html
 python3 -m llm_meter export-markdown --db llm-meter.db --output report.md
 ```
 
+导出完整分享包，适合排查、交接或发 issue：
+
+```bash
+python3 -m llm_meter export-bundle --db llm-meter.db --output llm-meter-report.zip
+```
+
+bundle 内包含 `report.html`、`report.md`、`report.json` 和 `manifest.json`。
+
 ## Docker
 
 ```bash
@@ -259,6 +267,7 @@ deploy/systemd/
 - [x] Demo 数据和静态报告生成器
 - [x] 部署 doctor 诊断命令
 - [x] Markdown 报告导出
+- [x] 可分享 report bundle 导出
 - [ ] PyPI / Homebrew 发布
 - [ ] 更完整的 Dashboard 图表
 

@@ -8,6 +8,7 @@ from pathlib import Path
 from . import __version__
 from .alerts import build_alert_payload, format_alert_text, send_webhook, should_alert
 from .analyzer import analyze_lines, format_text
+from .bundle import export_bundle
 from .config import load_config
 from .dashboard import render_dashboard, serve_dashboard
 from .demo import create_demo
@@ -115,6 +116,15 @@ def cmd_export_markdown(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_export_bundle(args: argparse.Namespace) -> int:
+    result = export_bundle(args.db, args.output, top=args.top)
+    if args.json:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    else:
+        print(f"wrote {result['output']}")
+    return 0
+
+
 def cmd_prune(args: argparse.Namespace) -> int:
     config = load_config(args.config)
     db = args.db or config.database
@@ -219,6 +229,13 @@ def build_parser() -> argparse.ArgumentParser:
     markdown.add_argument("--output", required=True, help="output Markdown file")
     markdown.add_argument("--top", type=int, default=10, help="top N rows per section")
     markdown.set_defaults(func=cmd_export_markdown)
+
+    bundle = sub.add_parser("export-bundle", help="export HTML, Markdown, JSON, and manifest as a zip bundle")
+    bundle.add_argument("--db", required=True, help="SQLite database path")
+    bundle.add_argument("--output", required=True, help="output zip file")
+    bundle.add_argument("--top", type=int, default=10, help="top N rows per section")
+    bundle.add_argument("--json", action="store_true", help="emit JSON")
+    bundle.set_defaults(func=cmd_export_bundle)
 
     prune = sub.add_parser("prune", help="delete old SQLite entries by retention window")
     prune.add_argument("--db", help="SQLite database path")

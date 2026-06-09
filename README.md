@@ -199,6 +199,14 @@ Export a Markdown report for incident notes, GitHub issues, runbooks, or chat ha
 python3 -m llm_meter export-markdown --db llm-meter.db --output report.md
 ```
 
+Export a complete share bundle for debugging or handoff:
+
+```bash
+python3 -m llm_meter export-bundle --db llm-meter.db --output llm-meter-report.zip
+```
+
+The bundle contains `report.html`, `report.md`, `report.json`, and `manifest.json`.
+
 This is useful for attaching reports to issues, incident notes, or status pages without running the live dashboard.
 
 ## Token and cost analytics
@@ -326,6 +334,7 @@ Gateway presets:
 - [x] Demo data + static report generator
 - [x] Deployment doctor diagnostics
 - [x] Markdown report export
+- [x] Shareable report bundle export
 - [ ] Homebrew / PyPI package
 - [ ] Richer dashboard charts
 
