@@ -7,6 +7,7 @@ from pathlib import Path
 
 from . import __version__
 from .analyzer import analyze_lines, format_text
+from .dashboard import serve_dashboard
 from .storage import hourly_counts, ingest_lines, report_from_db
 
 
@@ -56,6 +57,11 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0 if report.parsed else 2
 
 
+def cmd_serve(args: argparse.Namespace) -> int:
+    serve_dashboard(args.db, host=args.host, port=args.port)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="llm-meter",
@@ -83,6 +89,12 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("--top", type=int, default=10, help="top N rows per section")
     report.add_argument("--limit", type=int, help="only report over the newest N ingested entries")
     report.set_defaults(func=cmd_report)
+
+    serve = sub.add_parser("serve", help="serve a local web dashboard from a SQLite database")
+    serve.add_argument("--db", required=True, help="SQLite database path")
+    serve.add_argument("--host", default="127.0.0.1", help="listen host")
+    serve.add_argument("--port", type=int, default=8765, help="listen port")
+    serve.set_defaults(func=cmd_serve)
 
     return parser
 

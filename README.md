@@ -72,6 +72,7 @@ Persist to SQLite and report historical trends:
 python3 -m llm_meter ingest /var/log/nginx/llm-gateway-access.log --db llm-meter.db
 python3 -m llm_meter report --db llm-meter.db
 python3 -m llm_meter report --db llm-meter.db --json
+python3 -m llm_meter serve --db llm-meter.db --host 127.0.0.1 --port 8765
 ```
 
 Analyze only recent lines:
@@ -126,6 +127,16 @@ Signals:
   INFO  2 auth/rate-limit responses
 ```
 
+## Web dashboard
+
+After ingesting logs into SQLite, launch a dependency-free local dashboard:
+
+```bash
+python3 -m llm_meter serve --db llm-meter.db
+```
+
+Open <http://127.0.0.1:8765>. The dashboard also exposes the full JSON report at `/api/report`.
+
 ## Nginx setup
 
 LLM Meter works with common Nginx combined logs, but a custom format gives better analytics:
@@ -160,7 +171,7 @@ Full example: [docs/nginx.md](docs/nginx.md)
 ## Roadmap
 
 - [x] SQLite storage for historical trends
-- [ ] Web dashboard
+- [x] Web dashboard
 - [ ] Prometheus exporter
 - [ ] Telegram / Discord / webhook alerts
 - [x] Cloudflare Logpush parser

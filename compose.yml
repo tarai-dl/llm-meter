@@ -2,6 +2,12 @@ services:
   llm-meter:
     build: .
     image: llm-meter:local
+    ports:
+      - "8765:8765"
     volumes:
       - /var/log/nginx:/logs:ro
-    command: ["analyze", "/logs/llm-gateway-access.log"]
+      - llm-meter-data:/data
+    command: ["serve", "--db", "/data/llm-meter.db", "--host", "0.0.0.0", "--port", "8765"]
+
+volumes:
+  llm-meter-data:
