@@ -148,8 +148,9 @@ def cmd_demo(args: argparse.Namespace) -> int:
     else:
         print("LLM Meter demo generated")
         print(f"  log:  {result['log_path']}")
-        print(f"  db:   {result['db_path']}")
-        print(f"  html: {result['html_path']}")
+        print(f"  db:     {result['db_path']}")
+        print(f"  html:   {result['html_path']}")
+        print(f"  bundle: {result['bundle_path']}")
     return 0
 
 

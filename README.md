@@ -107,9 +107,10 @@ Generate a local demo pack for screenshots or quick evaluation:
 ```bash
 python3 -m llm_meter demo --output-dir /tmp/llm-meter-demo
 # open /tmp/llm-meter-demo/demo-report.html
+# share /tmp/llm-meter-demo/demo-report.zip
 ```
 
-The demo command writes deterministic sample JSONL logs, a SQLite database, and a static HTML dashboard report with traffic, token, cost, model, and alert-signal data.
+The demo command writes deterministic sample JSONL logs, a SQLite database, a static HTML dashboard report, and a zipped share bundle with traffic, token, cost, model, and alert-signal data.
 
 Diagnose a deployment before wiring it into cron/systemd:
 
@@ -335,6 +336,7 @@ Gateway presets:
 - [x] Token / cost analytics from JSON logs
 - [x] Budget alert rules for cost and token usage
 - [x] Demo data + static report generator
+- [x] Demo share bundle generator
 - [x] Deployment doctor diagnostics
 - [x] Markdown report export
 - [x] Shareable report bundle export

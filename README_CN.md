@@ -182,9 +182,10 @@ docker compose up -d
 ```bash
 python3 -m llm_meter demo --output-dir /tmp/llm-meter-demo
 # 打开 /tmp/llm-meter-demo/demo-report.html
+# 分享 /tmp/llm-meter-demo/demo-report.zip
 ```
 
-`demo` 命令会生成确定性的示例 JSONL 日志、SQLite 数据库和静态 HTML Dashboard 报告，里面包含流量、Token、成本、模型和告警信号数据。
+`demo` 命令会生成确定性的示例 JSONL 日志、SQLite 数据库、静态 HTML Dashboard 报告和 ZIP 分享包，里面包含流量、Token、成本、模型和告警信号数据。
 
 在接入 cron / systemd 前，可以先做部署诊断：
 
@@ -268,6 +269,7 @@ deploy/systemd/
 - [x] JSON 日志 Token / 成本分析
 - [x] 成本和 Token 预算告警规则
 - [x] Demo 数据和静态报告生成器
+- [x] Demo ZIP 分享包生成器
 - [x] 部署 doctor 诊断命令
 - [x] Markdown 报告导出
 - [x] 可分享 report bundle 导出

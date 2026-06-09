@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 
+from .bundle import export_bundle
 from .dashboard import render_dashboard
 from .storage import ingest_lines
 
@@ -25,6 +26,7 @@ def create_demo(output_dir: str | Path, rows: int = 96) -> dict:
     log_path = output / "demo-gateway.jsonl"
     db_path = output / "demo.db"
     html_path = output / "demo-report.html"
+    bundle_path = output / "demo-report.zip"
 
     lines = list(_demo_lines(rows))
     log_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -32,12 +34,14 @@ def create_demo(output_dir: str | Path, rows: int = 96) -> dict:
         db_path.unlink()
     ingest_lines(lines, db_path)
     html_path.write_text(render_dashboard(db_path), encoding="utf-8")
+    export_bundle(db_path, bundle_path)
 
     return {
         "rows": rows,
         "log_path": str(log_path),
         "db_path": str(db_path),
         "html_path": str(html_path),
+        "bundle_path": str(bundle_path),
     }
 
 

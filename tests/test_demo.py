@@ -10,14 +10,17 @@ def test_create_demo_writes_jsonl_db_and_html(tmp_path):
     assert result["log_path"].endswith("demo-gateway.jsonl")
     assert result["db_path"].endswith("demo.db")
     assert result["html_path"].endswith("demo-report.html")
+    assert result["bundle_path"].endswith("demo-report.zip")
     assert result["rows"] == 24
 
     log_path = output_dir / "demo-gateway.jsonl"
     db_path = output_dir / "demo.db"
     html_path = output_dir / "demo-report.html"
+    bundle_path = output_dir / "demo-report.zip"
     assert log_path.exists()
     assert db_path.exists()
     assert html_path.exists()
+    assert bundle_path.exists()
 
     report = report_from_db(db_path)
     payload = report.to_dict()
@@ -28,6 +31,11 @@ def test_create_demo_writes_jsonl_db_and_html(tmp_path):
     html = html_path.read_text(encoding="utf-8")
     assert "Estimated cost" in html
     assert "Cost by model" in html
+
+    import zipfile
+
+    with zipfile.ZipFile(bundle_path) as archive:
+        assert sorted(archive.namelist()) == ["manifest.json", "report.html", "report.json", "report.md"]
 
 
 def test_create_demo_is_deterministic(tmp_path):
