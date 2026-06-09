@@ -37,31 +37,45 @@ def connect(path: str | Path) -> sqlite3.Connection:
     return conn
 
 
-def ingest_lines(lines: Iterable[str], db_path: str | Path) -> dict:
+def ingest_lines(lines: Iterable[str], db_path: str | Path, batch_size: int = 1000) -> dict:
     conn = connect(db_path)
     parsed = 0
     failed = 0
+    inserted = 0
     rows: list[tuple] = []
-    for line in lines:
-        entry = parse_line(line)
-        if not entry:
-            failed += 1
-            continue
-        parsed += 1
-        rows.append(_entry_to_row(entry))
 
-    with conn:
-        conn.executemany(
-            """
-            INSERT INTO entries (
-                ts, ip, host, method, path, status, body_bytes, auth_prefix,
-                request_time, upstream_response_time, raw
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            rows,
-        )
-    conn.close()
-    return {"parsed": parsed, "failed": failed, "inserted": len(rows)}
+    def flush() -> None:
+        nonlocal inserted, rows
+        if not rows:
+            return
+        with conn:
+            conn.executemany(
+                """
+                INSERT INTO entries (
+                    ts, ip, host, method, path, status, body_bytes, auth_prefix,
+                    request_time, upstream_response_time, raw
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                rows,
+            )
+        inserted += len(rows)
+        rows = []
+
+    try:
+        for line in lines:
+            entry = parse_line(line)
+            if not entry:
+                failed += 1
+                continue
+            parsed += 1
+            rows.append(_entry_to_row(entry))
+            if len(rows) >= batch_size:
+                flush()
+    finally:
+        flush()
+        conn.close()
+
+    return {"parsed": parsed, "failed": failed, "inserted": inserted}
 
 
 def _entry_to_row(entry: LogEntry) -> tuple:

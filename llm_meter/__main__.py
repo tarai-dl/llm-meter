@@ -10,6 +10,7 @@ from .analyzer import analyze_lines, format_text
 from .dashboard import serve_dashboard
 from .prometheus import serve_prometheus
 from .storage import hourly_counts, ingest_lines, report_from_db
+from .tail import follow_file
 
 
 def iter_input(path: str):
@@ -30,7 +31,8 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
 
 def cmd_ingest(args: argparse.Namespace) -> int:
-    result = ingest_lines(iter_input(args.path), args.db)
+    source = follow_file(args.path, interval=args.interval, from_end=not args.from_start) if args.follow else iter_input(args.path)
+    result = ingest_lines(source, args.db, batch_size=args.batch_size)
     if args.json:
         print(json.dumps(result, indent=2, ensure_ascii=False))
     else:
@@ -87,6 +89,10 @@ def build_parser() -> argparse.ArgumentParser:
     ingest.add_argument("path", help="log path, or '-' for stdin")
     ingest.add_argument("--db", required=True, help="SQLite database path")
     ingest.add_argument("--json", action="store_true", help="emit JSON")
+    ingest.add_argument("--follow", "-f", action="store_true", help="keep ingesting appended lines, like tail -f")
+    ingest.add_argument("--from-start", action="store_true", help="with --follow, ingest existing lines before following")
+    ingest.add_argument("--interval", type=float, default=1.0, help="poll interval for --follow")
+    ingest.add_argument("--batch-size", type=int, default=1000, help="SQLite insert batch size")
     ingest.set_defaults(func=cmd_ingest)
 
     report = sub.add_parser("report", help="report from a SQLite database")

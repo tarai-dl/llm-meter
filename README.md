@@ -70,6 +70,7 @@ Persist to SQLite and report historical trends:
 
 ```bash
 python3 -m llm_meter ingest /var/log/nginx/llm-gateway-access.log --db llm-meter.db
+python3 -m llm_meter ingest /var/log/nginx/llm-gateway-access.log --db llm-meter.db --follow
 python3 -m llm_meter report --db llm-meter.db
 python3 -m llm_meter report --db llm-meter.db --json
 python3 -m llm_meter serve --db llm-meter.db --host 127.0.0.1 --port 8765
@@ -199,6 +200,10 @@ Full example: [docs/nginx.md](docs/nginx.md)
 - [ ] LiteLLM / OneAPI / NewAPI specific presets
 - [x] Docker Compose example
 - [ ] Homebrew / PyPI package
+
+## Inspirations
+
+LLM Meter is original code, but it learns from mature observability projects including [GoAccess](https://github.com/allinurl/goaccess), [google/mtail](https://github.com/google/mtail), [Vector](https://github.com/vectordotdev/vector), and [OpenLIT](https://github.com/openlit/openlit). See [docs/inspirations.md](docs/inspirations.md).
 
 ## Project goals
 
