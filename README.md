@@ -73,6 +73,7 @@ python3 -m llm_meter ingest /var/log/nginx/llm-gateway-access.log --db llm-meter
 python3 -m llm_meter report --db llm-meter.db
 python3 -m llm_meter report --db llm-meter.db --json
 python3 -m llm_meter serve --db llm-meter.db --host 127.0.0.1 --port 8765
+python3 -m llm_meter export-prometheus --db llm-meter.db --host 127.0.0.1 --port 9108
 ```
 
 Analyze only recent lines:
@@ -137,6 +138,26 @@ python3 -m llm_meter serve --db llm-meter.db
 
 Open <http://127.0.0.1:8765>. The dashboard also exposes the full JSON report at `/api/report`.
 
+## Prometheus exporter
+
+Expose metrics from a SQLite database:
+
+```bash
+python3 -m llm_meter export-prometheus --db llm-meter.db
+curl http://127.0.0.1:9108/metrics
+```
+
+Example scrape config:
+
+```yaml
+scrape_configs:
+  - job_name: llm-meter
+    static_configs:
+      - targets: ['127.0.0.1:9108']
+```
+
+High-cardinality metrics like IPs and paths are capped with `--top`.
+
 ## Nginx setup
 
 LLM Meter works with common Nginx combined logs, but a custom format gives better analytics:
@@ -172,7 +193,7 @@ Full example: [docs/nginx.md](docs/nginx.md)
 
 - [x] SQLite storage for historical trends
 - [x] Web dashboard
-- [ ] Prometheus exporter
+- [x] Prometheus exporter
 - [ ] Telegram / Discord / webhook alerts
 - [x] Cloudflare Logpush parser
 - [ ] LiteLLM / OneAPI / NewAPI specific presets

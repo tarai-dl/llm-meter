@@ -8,6 +8,7 @@ from pathlib import Path
 from . import __version__
 from .analyzer import analyze_lines, format_text
 from .dashboard import serve_dashboard
+from .prometheus import serve_prometheus
 from .storage import hourly_counts, ingest_lines, report_from_db
 
 
@@ -62,6 +63,11 @@ def cmd_serve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_export_prometheus(args: argparse.Namespace) -> int:
+    serve_prometheus(args.db, host=args.host, port=args.port, top=args.top)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="llm-meter",
@@ -95,6 +101,13 @@ def build_parser() -> argparse.ArgumentParser:
     serve.add_argument("--host", default="127.0.0.1", help="listen host")
     serve.add_argument("--port", type=int, default=8765, help="listen port")
     serve.set_defaults(func=cmd_serve)
+
+    exporter = sub.add_parser("export-prometheus", help="serve Prometheus metrics from a SQLite database")
+    exporter.add_argument("--db", required=True, help="SQLite database path")
+    exporter.add_argument("--host", default="127.0.0.1", help="listen host")
+    exporter.add_argument("--port", type=int, default=9108, help="listen port")
+    exporter.add_argument("--top", type=int, default=50, help="top N label values for high-cardinality metrics")
+    exporter.set_defaults(func=cmd_export_prometheus)
 
     return parser
 
