@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
+import json
 import re
 from typing import Optional
 
@@ -88,6 +89,11 @@ def _parse_request(value: str) -> tuple[str, str, str]:
 
 def parse_line(line: str) -> Optional[LogEntry]:
     line = line.rstrip("\n")
+    if not line:
+        return None
+    if line.lstrip().startswith("{"):
+        return _parse_json_line(line)
+
     match = LOG_RE.match(line) or COMBINED_RE.match(line)
     if not match:
         return None
@@ -111,3 +117,66 @@ def parse_line(line: str) -> Optional[LogEntry]:
         upstream_response_time=_parse_float(data.get("urt")),
         raw=line,
     )
+
+
+def _parse_json_line(line: str) -> Optional[LogEntry]:
+    try:
+        data = json.loads(line)
+    except json.JSONDecodeError:
+        return None
+
+    # Cloudflare Logpush commonly uses fields like ClientIP, ClientRequestHost,
+    # ClientRequestMethod, ClientRequestURI, EdgeResponseStatus, EdgeStartTimestamp.
+    ip = _first(data, "ClientIP", "clientIP", "client_ip", "ip") or "-"
+    host = _first(data, "ClientRequestHost", "host", "requestHost") or "-"
+    method = _first(data, "ClientRequestMethod", "method") or "-"
+    path = _first(data, "ClientRequestURI", "ClientRequestPath", "path", "uri") or "-"
+    protocol = _first(data, "ClientRequestProtocol", "protocol") or "-"
+    status = int(_first(data, "EdgeResponseStatus", "OriginResponseStatus", "status") or 0)
+    body_bytes = _parse_int(str(_first(data, "EdgeResponseBytes", "OriginResponseBytes", "body_bytes") or "0"))
+    ts = _parse_json_time(_first(data, "EdgeStartTimestamp", "Datetime", "timestamp", "ts"))
+    request_time = _parse_float(str(_first(data, "OriginResponseDurationMs", "RequestTimeMs") or ""))
+    if request_time is not None:
+        request_time = request_time / 1000
+
+    return LogEntry(
+        ip=ip,
+        realip="-",
+        cf=ip,
+        host=host,
+        auth_prefix="-",
+        time=ts,
+        method=method,
+        path=path,
+        protocol=protocol,
+        status=status,
+        body_bytes=body_bytes,
+        request_time=request_time,
+        upstream_response_time=request_time,
+        raw=line,
+    )
+
+
+def _first(data: dict, *keys: str):
+    for key in keys:
+        value = data.get(key)
+        if value not in (None, ""):
+            return value
+    return None
+
+
+def _parse_json_time(value) -> Optional[datetime]:
+    if not value:
+        return None
+    if isinstance(value, (int, float)):
+        # Cloudflare may use nanoseconds in some exports. Be permissive.
+        if value > 10_000_000_000_000:
+            value = value / 1_000_000_000
+        elif value > 10_000_000_000:
+            value = value / 1000
+        return datetime.fromtimestamp(value, tz=timezone.utc)
+    text = str(value).replace("Z", "+00:00")
+    try:
+        return datetime.fromisoformat(text)
+    except ValueError:
+        return None

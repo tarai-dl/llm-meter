@@ -153,7 +153,7 @@ Full example: [docs/nginx.md](docs/nginx.md)
 | Nginx combined access log | Supported |
 | Nginx custom gateway log | Supported |
 | Cloudflare real IP fields | Supported when present in Nginx log |
-| Cloudflare Logpush JSON | Planned |
+| Cloudflare Logpush JSON | Supported |
 | LiteLLM structured logs | Planned |
 | OneAPI/NewAPI logs | Planned |
 
@@ -163,7 +163,7 @@ Full example: [docs/nginx.md](docs/nginx.md)
 - [ ] Web dashboard
 - [ ] Prometheus exporter
 - [ ] Telegram / Discord / webhook alerts
-- [ ] Cloudflare Logpush parser
+- [x] Cloudflare Logpush parser
 - [ ] LiteLLM / OneAPI / NewAPI specific presets
 - [x] Docker Compose example
 - [ ] Homebrew / PyPI package
