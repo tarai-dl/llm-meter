@@ -112,6 +112,9 @@ alert:
     max_5xx_rate: 0.05
     max_latency_seconds: 30
     max_requests_per_ip: 1000
+    max_total_cost_usd: 10
+    max_total_tokens: 1000000
+    max_model_cost_usd: 5
 ```
 
 ```bash
@@ -119,7 +122,7 @@ python3 -m llm_meter alert --config examples/llm-meter.yml --text
 python3 -m llm_meter prune --config examples/llm-meter.yml
 ```
 
-当前规则覆盖：4xx 比例、5xx 比例、最大延迟、单 IP 请求量。示例见 [examples/llm-meter.yml](examples/llm-meter.yml)。
+当前规则覆盖：4xx 比例、5xx 比例、最大延迟、单 IP 请求量、总成本预算、总 token 预算、单模型成本预算。示例见 [examples/llm-meter.yml](examples/llm-meter.yml)。
 
 Token / 成本分析：
 
@@ -226,6 +229,7 @@ deploy/systemd/
 - [x] 自定义告警规则
 - [x] SQLite 数据保留清理
 - [x] JSON 日志 Token / 成本分析
+- [x] 成本和 Token 预算告警规则
 - [ ] PyPI / Homebrew 发布
 - [ ] 更完整的 Dashboard 图表
 

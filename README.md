@@ -231,6 +231,9 @@ alert:
     max_5xx_rate: 0.05
     max_latency_seconds: 30
     max_requests_per_ip: 1000
+    max_total_cost_usd: 10
+    max_total_tokens: 1000000
+    max_model_cost_usd: 5
 ```
 
 Then run:
@@ -240,7 +243,7 @@ python3 -m llm_meter alert --config examples/llm-meter.yml --text
 python3 -m llm_meter prune --config examples/llm-meter.yml
 ```
 
-Rules are intentionally simple and dependency-free: high 4xx/5xx rates, slow requests, and high request volume from a single IP. See [examples/llm-meter.yml](examples/llm-meter.yml).
+Rules are intentionally simple and dependency-free: high 4xx/5xx rates, slow requests, high request volume from a single IP, total cost budget, total token budget, and per-model cost budget. See [examples/llm-meter.yml](examples/llm-meter.yml).
 
 ## Nginx setup
 
@@ -293,6 +296,7 @@ Gateway presets:
 - [x] Configurable alert rules
 - [x] SQLite retention pruning
 - [x] Token / cost analytics from JSON logs
+- [x] Budget alert rules for cost and token usage
 - [ ] Homebrew / PyPI package
 - [ ] Richer dashboard charts
 

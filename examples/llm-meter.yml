@@ -16,3 +16,9 @@ alert:
     max_latency_seconds: 30
     # Warn if any single IP appears more than this many times.
     max_requests_per_ip: 1000
+    # Warn if estimated spend crosses this deployment budget.
+    max_total_cost_usd: 10
+    # Warn if stored requests cross this total token budget.
+    max_total_tokens: 1000000
+    # Warn if any single model crosses this estimated spend.
+    max_model_cost_usd: 5

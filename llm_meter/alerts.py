@@ -81,6 +81,40 @@ def _rule_signals(report, rules: dict) -> list[dict]:
                     "threshold": threshold,
                 })
 
+    max_total_cost_usd = rules.get("max_total_cost_usd")
+    if max_total_cost_usd is not None and report.cost_usd > float(max_total_cost_usd):
+        signals.append({
+            "level": "warn",
+            "kind": "budget_cost_exceeded",
+            "message": f"estimated cost ${report.cost_usd:.4f} exceeds budget ${float(max_total_cost_usd):.4f}",
+            "cost_usd": round(report.cost_usd, 8),
+            "threshold": float(max_total_cost_usd),
+        })
+
+    max_total_tokens = rules.get("max_total_tokens")
+    if max_total_tokens is not None and report.total_tokens > int(max_total_tokens):
+        signals.append({
+            "level": "warn",
+            "kind": "budget_tokens_exceeded",
+            "message": f"total tokens {report.total_tokens} exceeds budget {int(max_total_tokens)}",
+            "tokens": report.total_tokens,
+            "threshold": int(max_total_tokens),
+        })
+
+    max_model_cost_usd = rules.get("max_model_cost_usd")
+    if max_model_cost_usd is not None:
+        threshold = float(max_model_cost_usd)
+        for model, cost in report.cost_by_model.most_common(10):
+            if cost > threshold:
+                signals.append({
+                    "level": "warn",
+                    "kind": "model_cost_exceeded",
+                    "message": f"model {model} estimated cost ${cost:.4f} exceeds budget ${threshold:.4f}",
+                    "model": model,
+                    "cost_usd": round(cost, 8),
+                    "threshold": threshold,
+                })
+
     return signals
 
 

@@ -11,6 +11,9 @@ class AlertRules:
     max_5xx_rate: float | None = None
     max_latency_seconds: float | None = None
     max_requests_per_ip: int | None = None
+    max_total_cost_usd: float | None = None
+    max_total_tokens: int | None = None
+    max_model_cost_usd: float | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> "AlertRules":
@@ -20,11 +23,22 @@ class AlertRules:
             max_5xx_rate=_optional_float(data.get("max_5xx_rate")),
             max_latency_seconds=_optional_float(data.get("max_latency_seconds")),
             max_requests_per_ip=_optional_int(data.get("max_requests_per_ip")),
+            max_total_cost_usd=_optional_float(data.get("max_total_cost_usd")),
+            max_total_tokens=_optional_int(data.get("max_total_tokens")),
+            max_model_cost_usd=_optional_float(data.get("max_model_cost_usd")),
         )
 
     def to_dict(self) -> dict[str, float | int]:
         payload: dict[str, float | int] = {}
-        for name in ("max_4xx_rate", "max_5xx_rate", "max_latency_seconds", "max_requests_per_ip"):
+        for name in (
+            "max_4xx_rate",
+            "max_5xx_rate",
+            "max_latency_seconds",
+            "max_requests_per_ip",
+            "max_total_cost_usd",
+            "max_total_tokens",
+            "max_model_cost_usd",
+        ):
             value = getattr(self, name)
             if value is not None:
                 payload[name] = value
