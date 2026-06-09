@@ -12,6 +12,7 @@ from .config import load_config
 from .dashboard import render_dashboard, serve_dashboard
 from .demo import create_demo
 from .doctor import format_doctor_text, run_doctor
+from .markdown import render_markdown_report
 from .prometheus import serve_prometheus
 from .storage import hourly_counts, ingest_lines, prune_db, report_from_db
 from .tail import follow_file
@@ -103,6 +104,13 @@ def cmd_alert(args: argparse.Namespace) -> int:
 def cmd_export_html(args: argparse.Namespace) -> int:
     html = render_dashboard(args.db)
     Path(args.output).write_text(html, encoding="utf-8")
+    print(f"wrote {args.output}")
+    return 0
+
+
+def cmd_export_markdown(args: argparse.Namespace) -> int:
+    markdown = render_markdown_report(args.db, top=args.top)
+    Path(args.output).write_text(markdown, encoding="utf-8")
     print(f"wrote {args.output}")
     return 0
 
@@ -205,6 +213,12 @@ def build_parser() -> argparse.ArgumentParser:
     html.add_argument("--db", required=True, help="SQLite database path")
     html.add_argument("--output", required=True, help="output HTML file")
     html.set_defaults(func=cmd_export_html)
+
+    markdown = sub.add_parser("export-markdown", help="export a Markdown incident/share report")
+    markdown.add_argument("--db", required=True, help="SQLite database path")
+    markdown.add_argument("--output", required=True, help="output Markdown file")
+    markdown.add_argument("--top", type=int, default=10, help="top N rows per section")
+    markdown.set_defaults(func=cmd_export_markdown)
 
     prune = sub.add_parser("prune", help="delete old SQLite entries by retention window")
     prune.add_argument("--db", help="SQLite database path")

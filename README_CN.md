@@ -147,6 +147,12 @@ Token / 成本分析：
 python3 -m llm_meter export-html --db llm-meter.db --output report.html
 ```
 
+导出 Markdown 报告，适合 incident note、GitHub issue、runbook 或聊天交接：
+
+```bash
+python3 -m llm_meter export-markdown --db llm-meter.db --output report.md
+```
+
 ## Docker
 
 ```bash
@@ -252,6 +258,7 @@ deploy/systemd/
 - [x] 成本和 Token 预算告警规则
 - [x] Demo 数据和静态报告生成器
 - [x] 部署 doctor 诊断命令
+- [x] Markdown 报告导出
 - [ ] PyPI / Homebrew 发布
 - [ ] 更完整的 Dashboard 图表
 

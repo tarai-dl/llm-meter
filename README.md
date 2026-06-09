@@ -193,6 +193,12 @@ Export a shareable dashboard report as a single HTML file:
 python3 -m llm_meter export-html --db llm-meter.db --output report.html
 ```
 
+Export a Markdown report for incident notes, GitHub issues, runbooks, or chat handoff:
+
+```bash
+python3 -m llm_meter export-markdown --db llm-meter.db --output report.md
+```
+
 This is useful for attaching reports to issues, incident notes, or status pages without running the live dashboard.
 
 ## Token and cost analytics
@@ -319,6 +325,7 @@ Gateway presets:
 - [x] Budget alert rules for cost and token usage
 - [x] Demo data + static report generator
 - [x] Deployment doctor diagnostics
+- [x] Markdown report export
 - [ ] Homebrew / PyPI package
 - [ ] Richer dashboard charts
 
