@@ -1,6 +1,6 @@
 [project]
 name = "llm-meter"
-version = "0.19.0"
+version = "0.20.0"
 description = "Lightweight usage analytics and abuse detection for OpenAI-compatible API gateways"
 readme = "README.md"
 requires-python = ">=3.10"

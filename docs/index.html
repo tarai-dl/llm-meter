@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Meter demo</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: radial-gradient(circle at top left, rgba(56,189,248,.18), transparent 34%), #07111f; color: #e2e8f0; }
+    main { max-width: 1120px; margin: 0 auto; padding: 56px 22px 72px; }
+    a { color: #38bdf8; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .hero { display: grid; grid-template-columns: 1.2fr .8fr; gap: 26px; align-items: center; }
+    h1 { font-size: clamp(44px, 8vw, 82px); line-height: .92; letter-spacing: -.07em; margin: 0; }
+    .lead { font-size: 20px; color: #b6c3d1; line-height: 1.6; margin: 24px 0 0; }
+    .pill { display: inline-flex; gap: 8px; align-items: center; color: #a7f3d0; background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.28); border-radius: 999px; padding: 8px 12px; font-size: 13px; margin-bottom: 18px; }
+    .card { background: linear-gradient(180deg, rgba(15,23,42,.96), rgba(15,23,42,.76)); border: 1px solid #1e293b; border-radius: 22px; padding: 22px; box-shadow: 0 28px 90px rgba(0,0,0,.28); }
+    .terminal { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 14px; line-height: 1.7; color: #cbd5e1; white-space: pre-wrap; }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; padding: 12px 16px; font-weight: 700; background: #38bdf8; color: #04111f; }
+    .button.secondary { background: rgba(148,163,184,.12); color: #e2e8f0; border: 1px solid #334155; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+    .label { color: #94a3b8; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+    h2 { font-size: 32px; margin: 48px 0 16px; letter-spacing: -.04em; }
+    h3 { margin: 10px 0 8px; }
+    p { color: #b6c3d1; line-height: 1.65; }
+    ul { color: #b6c3d1; line-height: 1.8; padding-left: 20px; }
+    .preview { width: 100%; min-height: 560px; border: 1px solid #1e293b; border-radius: 20px; background: #020617; }
+    footer { color: #64748b; margin-top: 48px; font-size: 13px; }
+    @media (max-width: 900px) { .hero, .grid { grid-template-columns: 1fr; } main { padding-top: 36px; } }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div>
+      <div class="pill">Static demo · no real logs · safe to share</div>
+      <h1>LLM Meter demo</h1>
+      <p class="lead">Lightweight usage analytics, cost visibility, and abuse signals for OpenAI-compatible API gateways. This page is built from deterministic synthetic logs so you can inspect the product without exposing production traffic.</p>
+      <div class="cta">
+        <a class="button" href="demo-assets/demo-report.html">Open demo report</a>
+        <a class="button secondary" href="demo-assets/demo-report.zip">Download ZIP bundle</a>
+        <a class="button secondary" href="https://github.com/tarai-dl/llm-meter">GitHub</a>
+      </div>
+    </div>
+    <div class="card terminal">$ python3 -m llm_meter demo --output-dir demo-assets
+LLM Meter demo generated
+  log:    demo-assets/demo-gateway.jsonl
+  db:     demo-assets/demo.db
+  html:   demo-assets/demo-report.html
+  bundle: demo-assets/demo-report.zip</div>
+  </section>
+
+  <section class="grid">
+    <div class="card"><div class="label">Observe</div><h3>Traffic + errors</h3><p>Request volume, 2xx/4xx/5xx mix, top IPs, paths, hosts, auth prefixes, and hourly trend.</p></div>
+    <div class="card"><div class="label">Control spend</div><h3>Tokens + cost</h3><p>Roll up prompt, completion, and total tokens with estimated USD cost by model.</p></div>
+    <div class="card"><div class="label">Respond</div><h3>Signals + bundles</h3><p>Export HTML, Markdown, JSON, and manifest files for incident notes or support handoff.</p></div>
+  </section>
+
+  <h2>Demo artifacts</h2>
+  <div class="grid">
+    <div class="card"><div class="label">HTML</div><h3><a href="demo-assets/demo-report.html">demo-report.html</a></h3><p>Static dashboard report you can open locally or publish to a status page.</p></div>
+    <div class="card"><div class="label">Bundle</div><h3><a href="demo-assets/demo-report.zip">demo-report.zip</a></h3><p>ZIP with <code>report.html</code>, <code>report.md</code>, <code>report.json</code>, and <code>manifest.json</code>.</p></div>
+    <div class="card"><div class="label">Fixture</div><h3><a href="demo-assets/demo-gateway.jsonl">demo-gateway.jsonl</a></h3><p>Deterministic synthetic gateway logs for tests, screenshots, and local evaluation.</p></div>
+  </div>
+
+  <h2>Machine-readable output</h2>
+  <p>Need to inspect the raw report? Open <a href="demo-assets/report.json">report.json</a> or read the <a href="demo.md">demo walkthrough</a>.</p>
+
+  <h2>Embedded preview</h2>
+  <iframe class="preview" src="demo-assets/demo-report.html" title="LLM Meter static demo report"></iframe>
+
+  <footer>Generated from synthetic RFC 5737 documentation IP ranges and fake auth prefixes. Do not publish reports from real logs without reviewing IPs, paths, and key prefixes.</footer>
+</main>
+</body>
+</html>

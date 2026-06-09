@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://github.com/tarai-dl/llm-meter/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/tarai-dl/llm-meter/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/tarai-dl/llm-meter/actions/workflows/pages.yml"><img alt="Pages" src="https://github.com/tarai-dl/llm-meter/actions/workflows/pages.yml/badge.svg"></a>
   <a href="https://github.com/tarai-dl/llm-meter/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green.svg"></a>
   <img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-blue.svg">
   <img alt="Status" src="https://img.shields.io/badge/status-MVP-orange.svg">
@@ -20,6 +21,8 @@ LLM Meter turns plain access logs from Nginx / Cloudflare / self-hosted AI gatew
 It is designed for people running OpenAI-compatible API endpoints through tools like CLIProxyAPI, OneAPI/NewAPI, LiteLLM, LocalAI, Ollama-compatible gateways, or custom reverse proxies.
 
 > MVP status: CLI log analyzer plus SQLite history, dashboard, Prometheus exporter, webhook alerts, config files, and retention pruning.
+
+Live demo showcase: <https://tarai-dl.github.io/llm-meter/>
 
 ## Why
 
@@ -113,6 +116,8 @@ python3 -m llm_meter demo --output-dir /tmp/llm-meter-demo
 The demo command writes deterministic sample JSONL logs, a SQLite database, a static HTML dashboard report, and a zipped share bundle with traffic, token, cost, model, and alert-signal data.
 
 See [docs/demo.md](docs/demo.md) for the full demo pack walkthrough and safe sharing notes.
+
+The same deterministic artifacts are published by GitHub Pages at <https://tarai-dl.github.io/llm-meter/>.
 
 Diagnose a deployment before wiring it into cron/systemd:
 
@@ -341,6 +346,7 @@ Gateway presets:
 - [x] Demo data + static report generator
 - [x] Demo share bundle generator
 - [x] Demo pack walkthrough docs
+- [x] GitHub Pages demo showcase
 - [x] Deployment doctor diagnostics
 - [x] Markdown report export
 - [x] Shareable report bundle export

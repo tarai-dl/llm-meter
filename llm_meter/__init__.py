@@ -1,3 +1,3 @@
 """LLM Meter: usage analytics for OpenAI-compatible API gateway logs."""
 
-__version__ = "0.19.0"
+__version__ = "0.20.0"

@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://github.com/tarai-dl/llm-meter/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/tarai-dl/llm-meter/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/tarai-dl/llm-meter/actions/workflows/pages.yml"><img alt="Pages" src="https://github.com/tarai-dl/llm-meter/actions/workflows/pages.yml/badge.svg"></a>
   <a href="https://github.com/tarai-dl/llm-meter/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green.svg"></a>
   <img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-blue.svg">
   <img alt="Status" src="https://img.shields.io/badge/status-MVP-orange.svg">
@@ -18,6 +19,8 @@
 LLM Meter 可以把 Nginx / Cloudflare / 自建 AI 网关的访问日志转换为有用的报告：请求量、状态码、Top IP、auth prefix、路径、延迟、Token 用量、估算成本、异常信号、Web Dashboard、Prometheus 指标和 Webhook 告警。
 
 适合运行这些服务的人：CLIProxyAPI、OneAPI/NewAPI、LiteLLM、LocalAI、Ollama-compatible 网关，或任何自建 OpenAI-compatible reverse proxy。
+
+在线 demo 展示页：<https://tarai-dl.github.io/llm-meter/>
 
 ## 为什么需要它
 
@@ -189,6 +192,8 @@ python3 -m llm_meter demo --output-dir /tmp/llm-meter-demo
 
 完整 demo 包说明和安全分享注意事项见：[docs/demo.md](docs/demo.md)。
 
+同一套确定性 demo artifacts 也会通过 GitHub Pages 发布：<https://tarai-dl.github.io/llm-meter/>。
+
 在接入 cron / systemd 前，可以先做部署诊断：
 
 ```bash
@@ -274,6 +279,7 @@ deploy/systemd/
 - [x] Demo 数据和静态报告生成器
 - [x] Demo ZIP 分享包生成器
 - [x] Demo 包说明文档
+- [x] GitHub Pages demo 展示页
 - [x] 部署 doctor 诊断命令
 - [x] Markdown 报告导出
 - [x] 可分享 report bundle 导出
