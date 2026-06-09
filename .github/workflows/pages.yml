@@ -24,6 +24,8 @@ jobs:
           python-version: "3.12"
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - name: Generate demo assets
         run: |
           python -m llm_meter demo --output-dir docs/demo-assets --rows 144
