@@ -72,6 +72,15 @@ class Report:
         }
 
     def signals(self) -> list[dict]:
+        """Detect abuse and health signals from the aggregated report.
+
+        Thresholds (hardcoded — consider making configurable for production):
+        - dominant_ip: 100+ requests from a single IP with >= 25% traffic share
+        - auth_or_rate_limited: < 50 is info, >= 50 is warn (401/403/429)
+        - server_errors: any 5xx responses are warned
+        - slow_request: any request >= 60 seconds
+        - high_auth_prefix_diversity: 10+ unique auth prefixes
+        """
         signals: list[dict] = []
         if not self.parsed:
             return signals

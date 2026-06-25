@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import hmac
+import signal
+import sys
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -81,6 +84,19 @@ def serve_prometheus(db_path: str | Path, host: str = "127.0.0.1", port: int = 9
             self.wfile.write(data)
 
     server = ThreadingHTTPServer((host, port), Handler)
+
+    def _handle_signal(signum, _frame):
+        print(f"\nshutting down Prometheus exporter (signal {signum})...", file=sys.stderr, flush=True)
+        threading.Thread(target=server.shutdown).start()
+
+    try:
+        signal.signal(signal.SIGTERM, _handle_signal)
+        if sys.platform != "win32":
+            signal.signal(signal.SIGINT, _handle_signal)
+    except (ValueError, OSError):
+        # signal.signal only works in the main thread; graceful shutdown
+        # is unavailable in non-main contexts (e.g., tests, embedded use).
+        pass
     print(f"LLM Meter Prometheus exporter: http://{host}:{port}/metrics  db={db_path}")
     server.serve_forever()
 

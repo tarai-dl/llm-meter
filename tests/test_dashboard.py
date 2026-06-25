@@ -1,4 +1,10 @@
-from llm_meter.dashboard import render_dashboard, _check_auth
+from __future__ import annotations
+
+import threading
+import time
+from http.server import HTTPServer
+
+from llm_meter.dashboard import render_dashboard, _check_auth, serve_dashboard
 from llm_meter.storage import ingest_lines
 
 
@@ -45,3 +51,28 @@ def test_render_dashboard_limit_shows_recent_entries_only(tmp_path):
     assert "/old" not in html
     assert "198.51.100.23" in html
     assert "203.0.113.10" not in html
+
+
+def test_serve_dashboard_responds_to_requests(tmp_path):
+    """Server should start and respond to HTTP requests."""
+    db = tmp_path / "meter.db"
+    ingest_lines([
+        '203.0.113.10 realip=- cf=- host=a.example auth_prefix=a [09/Jun/2026:02:00:01 +0000] "GET /v1/models HTTP/2.0" 200 1 rt=0.1 uct=0.01 urt=0.09 "-" "curl"',
+    ], db)
+
+    # Use port 0 to get an available port, then start server in a thread
+    import socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("127.0.0.1", 0))
+    port = sock.getsockname()[1]
+    sock.close()
+
+    thread = threading.Thread(target=serve_dashboard, args=(db, "127.0.0.1", port), daemon=True)
+    thread.start()
+    time.sleep(0.5)
+
+    import urllib.request
+    resp = urllib.request.urlopen(f"http://127.0.0.1:{port}/healthz", timeout=2)
+    assert resp.status == 200
+    body = resp.read().decode()
+    assert body == "ok"

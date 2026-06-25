@@ -3,6 +3,9 @@ from __future__ import annotations
 import html
 import hmac
 import json
+import signal
+import sys
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -78,6 +81,19 @@ def serve_dashboard(db_path: str | Path, host: str = "127.0.0.1", port: int = 87
             self.wfile.write(data)
 
     server = ThreadingHTTPServer((host, port), Handler)
+
+    def _handle_signal(signum, _frame):
+        print(f"\nshutting down dashboard (signal {signum})...", file=sys.stderr, flush=True)
+        threading.Thread(target=server.shutdown).start()
+
+    try:
+        signal.signal(signal.SIGTERM, _handle_signal)
+        if sys.platform != "win32":
+            signal.signal(signal.SIGINT, _handle_signal)
+    except (ValueError, OSError):
+        # signal.signal only works in the main thread; graceful shutdown
+        # is unavailable in non-main contexts (e.g., tests, embedded use).
+        pass
     print(f"LLM Meter dashboard: http://{host}:{port}  db={db_path}")
     server.serve_forever()
 
