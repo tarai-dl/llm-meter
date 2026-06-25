@@ -35,3 +35,17 @@ def test_follow_file_can_read_from_start(tmp_path):
         assert next(follower) == "first line\n"
     finally:
         follower.close()
+
+
+def test_follow_file_truncates_long_lines(tmp_path):
+    log = tmp_path / "access.log"
+    long_line = "x" * 5000 + "\n"
+    log.write_text(long_line)
+    follower = follow_file(log, interval=0.01, from_end=False, max_line_length=100)
+    try:
+        result = next(follower)
+        # readline(size) reads at most size bytes; long lines are truncated.
+        assert len(result) == 100
+        assert result == "x" * 100
+    finally:
+        follower.close()

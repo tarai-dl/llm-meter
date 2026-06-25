@@ -163,6 +163,13 @@ Signals:
   INFO  2 auth/rate-limit responses
 ```
 
+## Security
+
+- **Auth tokens**: Use `--auth-token` when exposing the dashboard or Prometheus endpoint beyond localhost. The token is passed via `Authorization: Bearer <token>` header.
+- **Webhooks**: Ensure webhook endpoints use HTTPS and validate payloads. Webhook payloads may contain auth prefix metadata.
+- **Database**: The SQLite database contains parsed log data. Restrict filesystem permissions accordingly.
+- **Config files**: YAML configs may contain webhook URLs. Do not commit secrets to version control.
+
 ## Web dashboard
 
 After ingesting logs into SQLite, launch a dependency-free local dashboard:
@@ -173,6 +180,16 @@ python3 -m llm_meter serve --db llm-meter.db
 
 Open <http://127.0.0.1:8765>. The dashboard also exposes the full JSON report at `/api/report`.
 
+### Securing the dashboard
+
+When exposing the dashboard beyond localhost, use `--auth-token`:
+
+```bash
+python3 -m llm_meter serve --db llm-meter.db --auth-token your-secret-token
+```
+
+Clients must then send `Authorization: Bearer your-secret-token` with every request.
+
 ## Prometheus exporter
 
 Expose metrics from a SQLite database:
@@ -182,13 +199,22 @@ python3 -m llm_meter export-prometheus --db llm-meter.db
 curl http://127.0.0.1:9108/metrics
 ```
 
-Example scrape config:
+### Securing the Prometheus exporter
+
+```bash
+python3 -m llm_meter export-prometheus --db llm-meter.db --auth-token your-secret-token
+```
+
+Example scrape config with auth:
 
 ```yaml
 scrape_configs:
   - job_name: llm-meter
     static_configs:
       - targets: ['127.0.0.1:9108']
+    authorization:
+      type: Bearer
+      credentials: your-secret-token
 ```
 
 High-cardinality metrics like IPs and paths are capped with `--top`.

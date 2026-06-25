@@ -5,11 +5,17 @@ import time
 from typing import Iterator, TextIO
 
 
-def follow_file(path: str | Path, interval: float = 1.0, from_end: bool = True) -> Iterator[str]:
+def follow_file(path: str | Path, interval: float = 1.0, from_end: bool = True, max_line_length: int = 1024 * 1024) -> Iterator[str]:
     """Yield new lines appended to a file, similar to tail -f.
 
     This is deliberately small and dependency-free. It handles simple log rotation by
     reopening the file when its inode changes or the file shrinks.
+
+    Args:
+        path: File path to follow.
+        interval: Poll interval in seconds.
+        from_end: If True, start from the end of the file.
+        max_line_length: Maximum bytes to read per line (default 1 MiB).
     """
     path = Path(path)
     handle: TextIO | None = None
@@ -33,7 +39,7 @@ def follow_file(path: str | Path, interval: float = 1.0, from_end: bool = True) 
                     handle.seek(0, 2)
                 position = handle.tell()
 
-            line = handle.readline()
+            line = handle.readline(max_line_length)
             if line:
                 position = handle.tell()
                 yield line

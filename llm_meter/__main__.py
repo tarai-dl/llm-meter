@@ -52,7 +52,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
 
 def cmd_ingest(args: argparse.Namespace) -> int:
-    source = follow_file(args.path, interval=args.interval, from_end=not args.from_start) if args.follow else iter_input(args.path)
+    source = follow_file(args.path, interval=args.interval, from_end=not args.from_start, max_line_length=args.max_line_length) if args.follow else iter_input(args.path)
     result = ingest_lines(source, args.db, batch_size=args.batch_size)
     if args.json:
         print(json.dumps(result, indent=2, ensure_ascii=False))
@@ -230,6 +230,7 @@ def build_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--from-start", action="store_true", help="with --follow, ingest existing lines before following")
     ingest.add_argument("--interval", type=float, default=1.0, help="poll interval for --follow")
     ingest.add_argument("--batch-size", type=int, default=1000, help="SQLite insert batch size")
+    ingest.add_argument("--max-line-length", type=int, default=1048576, help="max bytes per log line (default 1 MiB)")
     ingest.set_defaults(func=cmd_ingest)
 
     report = sub.add_parser("report", help="report from a SQLite database")
