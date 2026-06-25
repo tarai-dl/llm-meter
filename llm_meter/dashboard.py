@@ -49,6 +49,18 @@ footer { color: #64748b; margin-top: 28px; font-size: 13px; }
 
 def serve_dashboard(db_path: str | Path, host: str = "127.0.0.1", port: int = 8765, auth_token: str | None = None) -> None:
     db_path = Path(db_path)
+    _cache: dict[str, tuple[float, str]] = {}
+    _cache_ttl = 30  # seconds
+
+    def _cached(key: str, limit: int | None, builder) -> str:
+        import time
+        now = time.time()
+        entry = _cache.get(key)
+        if entry and now - entry[0] < _cache_ttl:
+            return entry[1]
+        html = builder(db_path, limit=limit)
+        _cache[key] = (now, html)
+        return html
 
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):  # noqa: N802 - stdlib API
@@ -67,7 +79,8 @@ def serve_dashboard(db_path: str | Path, host: str = "127.0.0.1", port: int = 87
             if parsed.path not in ("/", "/index.html"):
                 self._send(404, "not found", "text/plain; charset=utf-8")
                 return
-            self._send(200, render_dashboard(db_path, limit=limit), "text/html; charset=utf-8")
+            cache_key = f"dashboard:{limit}"
+            self._send(200, _cached(cache_key, limit, render_dashboard), "text/html; charset=utf-8")
 
         def log_message(self, fmt, *args):  # noqa: A003 - stdlib API
             return

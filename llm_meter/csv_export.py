@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import os
 from pathlib import Path
 import sqlite3
 
@@ -37,11 +38,13 @@ def export_csv(db_path: str | Path, output: str | Path, limit: int | None = None
     finally:
         conn.close()
 
-    with output.open("w", newline="", encoding="utf-8") as handle:
+    tmp = output.with_suffix(output.suffix + ".tmp")
+    with tmp.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=CSV_COLUMNS)
         writer.writeheader()
         for row in rows:
             writer.writerow({column: row[column] for column in CSV_COLUMNS})
+    os.replace(tmp, output)
 
     return {"output": str(output), "rows": len(rows)}
 

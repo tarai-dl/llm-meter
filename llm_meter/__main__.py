@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -26,6 +27,15 @@ def iter_input(path: str):
         return
     with Path(path).open("r", encoding="utf-8", errors="replace") as handle:
         yield from handle
+
+
+def _atomic_write(output: str | Path, content: str, encoding: str = "utf-8") -> None:
+    """Write content to *output* atomically via a tmp file + os.replace()."""
+    target = Path(output)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp = target.with_suffix(target.suffix + ".tmp")
+    tmp.write_text(content, encoding=encoding)
+    os.replace(tmp, target)
 
 
 def cmd_analyze(args: argparse.Namespace) -> int:
@@ -120,14 +130,14 @@ def cmd_alert(args: argparse.Namespace) -> int:
 
 def cmd_export_html(args: argparse.Namespace) -> int:
     html = render_dashboard(args.db, limit=args.limit)
-    Path(args.output).write_text(html, encoding="utf-8")
+    _atomic_write(args.output, html)
     print(f"wrote {args.output}")
     return 0
 
 
 def cmd_export_markdown(args: argparse.Namespace) -> int:
     markdown = render_markdown_report(args.db, top=args.top)
-    Path(args.output).write_text(markdown, encoding="utf-8")
+    _atomic_write(args.output, markdown)
     print(f"wrote {args.output}")
     return 0
 

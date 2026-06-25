@@ -58,6 +58,18 @@ def render_prometheus_metrics(db_path: str | Path, top: int = 50) -> str:
 
 def serve_prometheus(db_path: str | Path, host: str = "127.0.0.1", port: int = 9108, top: int = 50, auth_token: str | None = None) -> None:
     db_path = Path(db_path)
+    _cache: dict[str, tuple[float, str]] = {}
+    _cache_ttl = 30  # seconds
+
+    def _cached(key: str, builder) -> str:
+        import time
+        now = time.time()
+        entry = _cache.get(key)
+        if entry and now - entry[0] < _cache_ttl:
+            return entry[1]
+        text = builder(db_path, top=top)
+        _cache[key] = (now, text)
+        return text
 
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):  # noqa: N802
@@ -70,7 +82,7 @@ def serve_prometheus(db_path: str | Path, host: str = "127.0.0.1", port: int = 9
             if self.path not in ("/metrics", "/"):
                 self._send(404, "not found\n", "text/plain; charset=utf-8")
                 return
-            self._send(200, render_prometheus_metrics(db_path, top=top), "text/plain; version=0.0.4; charset=utf-8")
+            self._send(200, _cached("metrics", render_prometheus_metrics), "text/plain; version=0.0.4; charset=utf-8")
 
         def log_message(self, fmt, *args):  # noqa: A003
             return
